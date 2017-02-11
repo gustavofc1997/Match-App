@@ -1,0 +1,29 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <!-- Default text sizes for the TextViews -->
+    <dimen name="text_size_nano">10sp</dimen>
+    <dimen name="text_size_micro">12sp</dimen>
+    <dimen name="text_size_small">14sp</dimen>
+    <dimen name="text_size_medium">18sp</dimen>
+    <dimen name="text_size_mediumL">20sp</dimen>
+    <dimen name="text_size_large">22sp</dimen>
+    <dimen name="text_size_bill">28sp</dimen>
+    <dimen name="text_size_extra_large">36sp</dimen>
+    <dimen name="text_size_lab_pin">54sp</dimen>
+
+    <!-- Spacing margins -->
+    <dimen name="margin_top_pin">50dp</dimen>
+    <dimen name="margin_pin_minor">38dp</dimen>
+    <dimen name="default_spacing_extra">34dp</dimen>
+    <dimen name="default_spacing_mega">28dp</dimen>
+    <dimen name="default_spacing_macro">22dp</dimen>
+    <dimen name="default_spacing_major">16dp</dimen>
+    <dimen name="default_spacing_minor">8dp</dimen>
+    <dimen name="default_spacing_medium">11dp</dimen>
+    <dimen name="default_spacing_micro">4dp</dimen>
+    <dimen name="default_spacing_nano">2dp</dimen>
+
+    <dimen name="padding_edit_text">12dp</dimen>
+</resources>
