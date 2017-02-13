@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Match App</string>
+    <string name="lab_sign_up">Registro</string>
+    <string name="lab_login">Iniciar sesión</string>
 </resources>
