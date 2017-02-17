@@ -10,7 +10,7 @@
         <activity
             android:name=".ui.activities.SplashActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Splash">
+            android:theme="@style/AppThemeNoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

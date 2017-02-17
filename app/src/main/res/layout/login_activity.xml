@@ -26,19 +26,6 @@
             android:src="@mipmap/ic_launcher" />
 
         <TextView
-
-            android:id="@+id/lab_sign_up"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/default_spacing_mega"
-            android:background="@drawable/btn_signup"
-            android:gravity="center"
-            android:padding="@dimen/default_spacing_minor"
-            android:text="@string/lab_sign_up"
-            android:textAllCaps="true"
-            android:textColor="@android:color/white" />
-
-        <TextView
             android:id="@+id/lab_login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
