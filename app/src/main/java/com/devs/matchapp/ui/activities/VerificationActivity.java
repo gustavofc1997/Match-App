@@ -12,7 +12,7 @@ import com.devs.matchapp.R;
  */
 
 
-public class LoginActivity extends AppCompatActivity {
+public class VerificationActivity extends AppCompatActivity {
 
 
     @Override

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:attribute="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
@@ -7,19 +8,84 @@
     android:layout_centerInParent="true"
     android:background="@drawable/bg"
     android:gravity="center"
+    android:orientation="vertical"
     tools:context="com.devs.matchapp.ui.activities.SignUpActivity">
+
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_signup"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/overlay"
+        android:elevation="10dp"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Crear Cuenta"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_medium" />
+    </android.support.v7.widget.Toolbar>
+
+    <developer.shivam.library.CrescentoContainer
+        android:id="@+id/Layout"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="@color/overlay"
+        android:elevation="10dp"
+        attribute:curvature="40dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/img_photo1"
+            android:background="@drawable/border"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:padding="@dimen/default_spacing_minor"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/camera" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/img_photo2"
+            android:layout_width="80dp"
+            android:layout_toLeftOf="@id/img_photo1"
+            android:layout_height="80dp"
+            android:layout_marginRight="@dimen/default_spacing_micro"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"
+            android:src="@drawable/camera"
+            android:background="@drawable/border"
+            android:padding="@dimen/default_spacing_minor"
+            />
+
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/img_photo3"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginLeft="@dimen/default_spacing_micro"
+            android:layout_marginTop="40dp"
+            android:layout_toRightOf="@id/img_photo1"
+            android:padding="@dimen/default_spacing_minor"
+            android:background="@drawable/border"
+            android:src="@drawable/camera" />
+
+    </developer.shivam.library.CrescentoContainer>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
+        android:layout_below="@id/Layout"
         android:background="@color/overlay"
         android:gravity="center"
         android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="270dp"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
@@ -29,6 +95,7 @@
                 android:textColorHint="@android:color/white">
 
                 <EditText
+                    android:id="@+id/editText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@null"
@@ -50,8 +117,9 @@
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
+
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/default_spacing_micro"
+                android:layout_marginTop="@dimen/default_spacing_minor"
                 android:textColorHint="@android:color/white">
 
                 <EditText
@@ -89,65 +157,71 @@
                     android:textSize="@dimen/text_size_mediumL" />
 
                 <RadioGroup
+                    android:id="@+id/radioGroup_genre"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:weightSum="3">
 
                     <RadioButton
-                        android:button="@null"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-
-                    <RadioButton
-                        android:button="@null"
-
+                        android:id="@+id/radio_man"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:gravity="center" />
-
-                    <RadioButton
+                        android:button="@null"
+                        android:drawableTop="@drawable/selector_man"
                         android:gravity="center"
-                        android:button="@null"
+                        android:text="Hombre"
+                        android:textColor="@color/color_unselected" />
+
+                    <RadioButton
+                        android:id="@+id/radio_woman"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        />
+                        android:button="@null"
+                        android:drawableTop="@drawable/selector_woman"
+                        android:gravity="center"
+                        android:text="Mujer"
+                        android:textColor="@color/color_unselected" />
+
+                    <RadioButton
+                        android:id="@+id/radio_other"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:text="Otro"
+                        android:textColor="@color/color_unselected" />
 
                 </RadioGroup>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:weightSum="3">
+                    android:layout_marginTop="@dimen/default_spacing_major"
+                    android:orientation="horizontal">
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="Hombre"
-                        android:textColor="@android:color/white" />
+                        android:text="Estoy interesado en:"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/text_size_medium" />
 
-                    <TextView
-                        android:layout_width="0dp"
+                    <com.weiwangcn.betterspinner.library.BetterSpinner
+                        android:id="@+id/spin_interested"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="Mujer"
-                        android:textColor="@android:color/white" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="Otro"
-                        android:textColor="@android:color/white" />
-
-
+                        android:layout_marginLeft="@dimen/default_spacing_minor"
+                        android:background="@null"
+                        android:hint="Seleccionar"
+                        android:shadowColor="@android:color/white"
+                        android:textColor="@android:color/white"
+                        android:textColorHighlight="@android:color/white"
+                        android:textColorHint="@android:color/white"
+                        android:textSize="@dimen/text_size_medium" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -168,5 +242,4 @@
 
     </LinearLayout>
 
-
-</RelativeLayout>
+</LinearLayout>

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Match App</string>
+    <string name="app_name">Find People</string>
     <string name="lab_sign_up">Crear Cuenta</string>
     <string name="lab_login">Iniciar sesión</string>
 </resources>

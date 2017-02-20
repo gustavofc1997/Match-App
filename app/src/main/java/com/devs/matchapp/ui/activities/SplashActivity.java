@@ -24,6 +24,7 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void run() {
                 IntentHelper.goToSignUp(SplashActivity.this);
+                finish();
             }
         }, 2500);
     }
