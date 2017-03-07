@@ -1,11 +1,10 @@
-package com.devs.matchapp.ui.activities;
+package com.devsideas.leapchat.ui.activities;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.RadioButton;
 
-import com.devs.matchapp.R;
+import com.devsideas.leapchat.R;
 
 /**
  * Created by Gustavo on 2/12/2017.

@@ -1,4 +1,4 @@
-package com.devs.matchapp;
+package com.devsideas.leapchat;
 
 import org.junit.Test;
 

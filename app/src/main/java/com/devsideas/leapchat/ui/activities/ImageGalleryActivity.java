@@ -1,4 +1,4 @@
-package com.devs.matchapp.ui.activities;
+package com.devsideas.leapchat.ui.activities;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -15,7 +15,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
-import com.devs.matchapp.util.AppConstants;
+import com.devsideas.leapchat.util.AppConstants;
 
 import java.io.File;
 

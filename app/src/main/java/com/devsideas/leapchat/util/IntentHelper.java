@@ -1,11 +1,11 @@
-package com.devs.matchapp.util;
+package com.devsideas.leapchat.util;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.devs.matchapp.ui.activities.VerificationActivity;
-import com.devs.matchapp.ui.activities.SignUpActivity;
+import com.devsideas.leapchat.ui.activities.VerificationActivity;
+import com.devsideas.leapchat.ui.activities.SignUpActivity;
 
 /**
  * Created by Gustavo on 2/12/2017.

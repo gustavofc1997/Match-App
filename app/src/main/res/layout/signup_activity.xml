@@ -9,7 +9,7 @@
     android:background="@drawable/bg"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context="com.devs.matchapp.ui.activities.SignUpActivity">
+    tools:context="com.devsideas.leapchat.ui.activities.SignUpActivity">
 
 
     <android.support.v7.widget.Toolbar
@@ -39,26 +39,25 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/img_photo1"
-            android:background="@drawable/border"
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:padding="@dimen/default_spacing_minor"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="30dp"
+            android:background="@drawable/border"
+            android:padding="@dimen/default_spacing_minor"
             android:src="@drawable/camera" />
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/img_photo2"
             android:layout_width="80dp"
-            android:layout_toLeftOf="@id/img_photo1"
             android:layout_height="80dp"
-            android:layout_marginRight="@dimen/default_spacing_micro"
             android:layout_centerHorizontal="true"
+            android:layout_marginRight="@dimen/default_spacing_micro"
             android:layout_marginTop="40dp"
-            android:src="@drawable/camera"
+            android:layout_toLeftOf="@id/img_photo1"
             android:background="@drawable/border"
             android:padding="@dimen/default_spacing_minor"
-            />
+            android:src="@drawable/camera" />
 
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -68,8 +67,8 @@
             android:layout_marginLeft="@dimen/default_spacing_micro"
             android:layout_marginTop="40dp"
             android:layout_toRightOf="@id/img_photo1"
-            android:padding="@dimen/default_spacing_minor"
             android:background="@drawable/border"
+            android:padding="@dimen/default_spacing_minor"
             android:src="@drawable/camera" />
 
     </developer.shivam.library.CrescentoContainer>
@@ -95,11 +94,11 @@
                 android:textColorHint="@android:color/white">
 
                 <EditText
-                    android:id="@+id/editText"
+                    android:id="@+id/txt_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@null"
-                    android:hint="Nombre"
+                    android:hint="@string/hint_name"
                     android:imeOptions="actionNext"
                     android:inputType="text"
                     android:maxLines="1"
@@ -117,18 +116,18 @@
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/default_spacing_minor"
                 android:textColorHint="@android:color/white">
 
                 <EditText
+                    android:id="@+id/txt_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@null"
-                    android:hint="Numero de telefono"
+                    android:hint="@string/hint_phone"
                     android:imeOptions="actionNext"
-                    android:inputType="text"
+                    android:inputType="phone"
                     android:maxLines="1"
                     android:padding="8dp"
                     android:singleLine="true"
@@ -227,14 +226,14 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/lab_login"
+                android:id="@+id/lab_signup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/default_spacing_major"
                 android:background="@drawable/btn_login"
                 android:gravity="center"
                 android:padding="@dimen/default_spacing_minor"
-                android:text="@string/lab_sign_up"
+                android:text="@string/lab_next"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/text_size_medium" />
 
