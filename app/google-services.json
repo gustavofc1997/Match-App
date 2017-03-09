@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "145138270494",
+    "firebase_url": "https://leapchat-160802.firebaseio.com",
+    "project_id": "leapchat-160802",
+    "storage_bucket": "leapchat-160802.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:145138270494:android:b3ab19ea045d7fe7",
+        "android_client_info": {
+          "package_name": "com.devsideas.leapchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "145138270494-4uumd2t7joqh7a454sqqupen1r7b3g4q.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "145138270494-kqhkhbsuvufpu75vpcrhkq3fhq40nu3d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhJqC5koyr0eSBwAsJhbC2xT4IiejMlpg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-75754908-4"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

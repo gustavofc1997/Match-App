@@ -12,9 +12,11 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.devsideas.leapchat.BuildConfig;
 import com.devsideas.leapchat.R;
 import com.devsideas.leapchat.util.AppConstants;
+import com.devsideas.leapchat.util.ImageLoader;
+import com.devsideas.leapchat.util.IntentHelper;
+import com.devsideas.leapchat.util.SharedPreferenceHelper;
 import com.digits.sdk.android.AuthCallback;
 import com.digits.sdk.android.AuthConfig;
 import com.digits.sdk.android.ConfirmationCodeCallback;
@@ -24,6 +26,8 @@ import com.digits.sdk.android.DigitsSession;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.weiwangcn.betterspinner.library.BetterSpinner;
+
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -37,11 +41,10 @@ public class SignUpActivity extends ImageGalleryActivity implements RadioGroup.O
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
     private static final String TWITTER_KEY = "ri1Tekkh5lrSwABgGafCGVOdO";
     private static final String TWITTER_SECRET = "QJ8Kbqd32NRwgywtRNm0wzrkSOAfAHFQEgFQPpTboxlH24disA";
-
+    @Inject
+    ImageLoader imageLoader;
     @Bind(R.id.txt_name)
     EditText mTxtName;
-    @Bind(R.id.txt_phone)
-    EditText mTxtPhone;
     @Bind(R.id.radioGroup_genre)
     RadioGroup mRadioGroup;
     @Bind(R.id.radio_man)
@@ -84,6 +87,10 @@ public class SignUpActivity extends ImageGalleryActivity implements RadioGroup.O
             @Override
             public void success(DigitsSession session, String phoneNumber) {
                 // Do something with the session
+                SharedPreferenceHelper.saveString(SharedPreferenceHelper.Phone, phoneNumber);
+                finish();
+                SharedPreferenceHelper.saveBoolean(SharedPreferenceHelper.ACTIVE, true);
+                IntentHelper.goToHome(SignUpActivity.this);
             }
 
             @Override
@@ -109,21 +116,20 @@ public class SignUpActivity extends ImageGalleryActivity implements RadioGroup.O
     void signUp() {
 //        if (!path1.equals("") && !path2.equals("") && !path3.equals("")) {
         if (!mTxtName.getText().toString().equals("") && mTxtName.getText().toString().length() > 4) {
-            if (!mTxtPhone.getText().toString().equals("") && mTxtPhone.getText().length() == 10) {
-                if (!mGenre.equals("")) {
+            if (!mGenre.equals("")) {
+                SharedPreferenceHelper.saveString(SharedPreferenceHelper.Name, mTxtName.getText().toString());
+                SharedPreferenceHelper.saveString(SharedPreferenceHelper.Genre, mGenre);
+//                    SharedPreferenceHelper.saveString(SharedPreferenceHelper.Interested, mGenre);
 //                        if (!mInterested.equals("")) {
-                    AuthConfig.Builder digitsAuthConfigBuilder = new AuthConfig.Builder()
-                            .withAuthCallBack(authCallback)
+                AuthConfig.Builder digitsAuthConfigBuilder = new AuthConfig.Builder()
+                        .withAuthCallBack(authCallback);
 //                            .withCustomPhoneNumberScreen(confirmationCodeCallback)
 //                            .withPartnerKey(BuildConfig.PARTNER_KEY)
-                            .withPhoneNumber("+57" + mTxtPhone.getText().toString());
-                    Digits.authenticate(digitsAuthConfigBuilder.build());
+                Digits.authenticate(digitsAuthConfigBuilder.build());
 //                        } else
 //                            Toasty.warning(this, getString(R.string.miss_interested), Toast.LENGTH_SHORT, true).show();
-                } else
-                    Toasty.warning(this, getString(R.string.miss_genre), Toast.LENGTH_SHORT, true).show();
             } else
-                Toasty.warning(this, getString(R.string.miss_phone), Toast.LENGTH_SHORT, true).show();
+                Toasty.warning(this, getString(R.string.miss_genre), Toast.LENGTH_SHORT, true).show();
         } else
             Toasty.warning(this, getString(R.string.miss_name), Toast.LENGTH_SHORT, true).show();
 //        } else

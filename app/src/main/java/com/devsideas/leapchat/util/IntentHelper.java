@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.devsideas.leapchat.ui.activities.VerificationActivity;
+import com.devsideas.leapchat.ui.activities.HomeActivity;
 import com.devsideas.leapchat.ui.activities.SignUpActivity;
 
 /**
@@ -14,8 +14,8 @@ import com.devsideas.leapchat.ui.activities.SignUpActivity;
 public class IntentHelper {
 
 
-    public static void goToLogin(Activity activity) {
-        launchIntent(activity, VerificationActivity.class);
+    public static void goToHome(Activity activity) {
+        launchIntent(activity, HomeActivity.class);
     }
 
     public static void goToSignUp(Activity activity) {
