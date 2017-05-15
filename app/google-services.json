@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "145138270494-9c3plk9h7rsqe4dtq7du39uut0gvivt3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.devsideas.leapchat",
+            "certificate_hash": "61f588caa7b7c46fcc35cd2b209fb3d665c6a979"
+          }
+        },
+        {
           "client_id": "145138270494-4uumd2t7joqh7a454sqqupen1r7b3g4q.apps.googleusercontent.com",
           "client_type": 3
         },

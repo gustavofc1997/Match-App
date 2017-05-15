@@ -12,5 +12,7 @@ public interface AppConstants {
     String MEN = "Men";
     String OTHER = "Other";
     String BOTH = "Both";
-
+    String Token = "TOKEN_TO_SERVER";
+    String URLNOTIFICATION = "https://fcm.googleapis.com/fcm/send";
+    String SERVER_KEY = "AAAAIcrqQR4:APA91bGWEQnSElpdJH-HSV-FEDHJJSJNE45dtdSml3JdFY0G-XATiV-L9jiMa5D-MGQMhH3qjPezkNo8MhzznkOtWYJMrlrlgBXxNb3YR989mCxxpRCbokQiQu9reBvxhKKft3q0Vrag";
 }

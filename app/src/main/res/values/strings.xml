@@ -10,6 +10,8 @@
     <string name="miss_interested">Selecciona tu interes</string>
     <string name="hint_name">Nombre</string>
     <string name="hint_phone">Numero telefonico</string>
-    <string name="discover_nearby_devices">Discover nearby devices</string>
-    <string name="share_device_information">Share device information</string>
+    <string name="discover_nearby_devices">Encontrar dispositivos cercanos</string>
+    <string name="share_device_information">Compartir mi informacion</string>
+    <string name="interested">¿Te interesa?</string>
+    <string name="meet_people">¿Estas interesado en conocer a esta persona?</string>
 </resources>

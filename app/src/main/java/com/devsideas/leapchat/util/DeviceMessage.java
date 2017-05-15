@@ -1,7 +1,7 @@
 package com.devsideas.leapchat.util;
-import android.os.Build;
 
 import com.google.android.gms.nearby.messages.Message;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 
 import java.nio.charset.Charset;
@@ -16,13 +16,13 @@ public class DeviceMessage {
     private static final Gson gson = new Gson();
 
     private final String mUUID;
-    private final String mMessageBody;
+    private final String mUserName;
 
     /**
      * Builds a new {@link Message} object using a unique identifier.
      */
-    public static Message newNearbyMessage(String instanceId) {
-        DeviceMessage deviceMessage = new DeviceMessage(instanceId);
+    public static Message newNearbyMessage() {
+        DeviceMessage deviceMessage = new DeviceMessage();
         return new Message(gson.toJson(deviceMessage).getBytes(Charset.forName("UTF-8")));
     }
 
@@ -37,13 +37,17 @@ public class DeviceMessage {
                 DeviceMessage.class);
     }
 
-    private DeviceMessage(String uuid) {
-        mUUID = uuid;
-        mMessageBody = SharedPreferenceHelper.loadString(SharedPreferenceHelper.Name);
+    public String getmUUID() {
+        return mUUID;
+    }
+
+    private DeviceMessage() {
+        mUUID = FirebaseInstanceId.getInstance().getToken();
+        mUserName = SharedPreferenceHelper.loadString(SharedPreferenceHelper.Name);
         // TODO(developer): add other fields that must be included in the Nearby Message payload.
     }
 
-    public String getMessageBody() {
-        return mMessageBody;
+    public String getUserName() {
+        return mUserName;
     }
 }
