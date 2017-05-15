@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:attribute="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_centerInParent="true"
+    android:background="@drawable/bg"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context="com.devsideas.leapchat.ui.activities.SignUpActivity">
+
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_signup"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/overlay"
+        android:elevation="10dp"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Crear Cuenta"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_medium" />
+    </android.support.v7.widget.Toolbar>
+
+    <developer.shivam.library.CrescentoContainer
+        android:id="@+id/Layout"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="@color/overlay"
+        android:elevation="10dp"
+        attribute:curvature="40dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/img_photo1"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/border"
+            android:padding="@dimen/default_spacing_minor"
+            android:src="@drawable/camera" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/img_photo2"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginRight="@dimen/default_spacing_micro"
+            android:layout_marginTop="40dp"
+            android:layout_toLeftOf="@id/img_photo1"
+            android:background="@drawable/border"
+            android:padding="@dimen/default_spacing_minor"
+            android:src="@drawable/camera" />
+
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/img_photo3"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginLeft="@dimen/default_spacing_micro"
+            android:layout_marginTop="40dp"
+            android:layout_toRightOf="@id/img_photo1"
+            android:background="@drawable/border"
+            android:padding="@dimen/default_spacing_minor"
+            android:src="@drawable/camera" />
+
+    </developer.shivam.library.CrescentoContainer>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_below="@id/Layout"
+        android:background="@color/overlay"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColorHint="@android:color/white">
+
+                <EditText
+                    android:id="@+id/txt_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:hint="@string/hint_name"
+                    android:imeOptions="actionNext"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:padding="8dp"
+                    android:singleLine="true"
+                    android:textColor="@android:color/white"
+                    android:textColorHint="@android:color/white"
+                    android:textSize="@dimen/text_size_medium" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@android:color/white" />
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/default_spacing_major"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Genero"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/text_size_mediumL" />
+
+                <RadioGroup
+                    android:id="@+id/radioGroup_genre"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+                    <RadioButton
+                        android:id="@+id/radio_man"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:button="@null"
+                        android:drawableTop="@drawable/selector_man"
+                        android:gravity="center"
+                        android:text="Hombre"
+                        android:textColor="@color/color_unselected" />
+
+                    <RadioButton
+                        android:id="@+id/radio_woman"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:button="@null"
+                        android:drawableTop="@drawable/selector_woman"
+                        android:gravity="center"
+                        android:text="Mujer"
+                        android:textColor="@color/color_unselected" />
+
+                    <RadioButton
+                        android:id="@+id/radio_other"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:text="Otro"
+                        android:textColor="@color/color_unselected" />
+
+                </RadioGroup>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/default_spacing_major"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Estoy interesado en:"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/text_size_medium" />
+
+                    <com.weiwangcn.betterspinner.library.BetterSpinner
+                        android:id="@+id/spin_interested"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/default_spacing_minor"
+                        android:background="@null"
+                        android:hint="Seleccionar"
+                        android:shadowColor="@android:color/white"
+                        android:textColor="@android:color/white"
+                        android:textColorHighlight="@android:color/white"
+                        android:textColorHint="@android:color/white"
+                        android:textSize="@dimen/text_size_medium" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/lab_signup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/default_spacing_major"
+                android:background="@drawable/btn_login"
+                android:gravity="center"
+                android:padding="@dimen/default_spacing_minor"
+                android:text="@string/lab_next"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_medium" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,3 +1,15 @@
 <resources>
-    <string name="app_name">Match App</string>
+    <string name="app_name">LeapChat</string>
+    <string name="lab_sign_up">Crear Cuenta</string>
+    <string name="lab_next">Siguiente</string>
+    <string name="lab_login">Iniciar sesión</string>
+    <string name="miss_pictures">Asegurate de cargar todas las fotos</string>
+    <string name="miss_name">Escribe un nombre valido</string>
+    <string name="miss_phone">Escribe numero de telefono valido</string>
+    <string name="miss_genre">Selecciona tu genero</string>
+    <string name="miss_interested">Selecciona tu interes</string>
+    <string name="hint_name">Nombre</string>
+    <string name="hint_phone">Numero telefonico</string>
+    <string name="discover_nearby_devices">Discover nearby devices</string>
+    <string name="share_device_information">Share device information</string>
 </resources>
