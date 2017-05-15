@@ -2,7 +2,7 @@ package com.devsideas.leapchat.chat;
 
 import android.util.Log;
 
-import com.firebase.client.ChildEventListener;
+import com.devsideas.leapchat.util.SharedPreferenceHelper;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -22,31 +22,33 @@ public class MessageDataSource {
     private static final String COLUMN_SENDER = "sender";
 
 
-    public static void saveMessage(Message message, String convoId){
+    public static void saveMessage(Message message, String convoId) {
         Date date = message.getDate();
         String key = sDateFormat.format(date);
         HashMap<String, String> msg = new HashMap<>();
         msg.put(COLUMN_TEXT, message.getText());
-        msg.put(COLUMN_SENDER,"Ajay");
+        msg.put(COLUMN_SENDER, SharedPreferenceHelper.loadString(SharedPreferenceHelper.Phone));
         sRef.child(convoId).child(key).setValue(msg);
     }
 
-    public static MessagesListener addMessagesListener(String convoId, final MessagesCallbacks callbacks){
+    public static MessagesListener addMessagesListener(String convoId, final MessagesCallbacks callbacks) {
         MessagesListener listener = new MessagesListener(callbacks);
         sRef.child(convoId).addChildEventListener(listener);
         return listener;
 
     }
 
-    public static void stop(MessagesListener listener){
+    public static void stop(MessagesListener listener) {
         sRef.removeEventListener(listener);
     }
 
-    public static class MessagesListener implements ChildEventListener {
+    public static class MessagesListener implements com.firebase.client.ChildEventListener {
         private MessagesCallbacks callbacks;
-        MessagesListener(MessagesCallbacks callbacks){
+
+        MessagesListener(MessagesCallbacks callbacks) {
             this.callbacks = callbacks;
         }
+
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             HashMap<String,String> msg = (HashMap)dataSnapshot.getValue();
@@ -87,7 +89,7 @@ public class MessageDataSource {
     }
 
 
-    public interface MessagesCallbacks{
+    public interface MessagesCallbacks {
         public void onMessageAdded(Message message);
     }
 }

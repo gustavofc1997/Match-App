@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public class SharedPreferenceHelper {
 
     public final static String ACTIVE = "com.active_user";
+    public final static String MY_PIC = "com.active_my_pic";
     public final static String Name = "com.leapchat_name";
     public final static String Genre = "com.leapchat_genre";
     public final static String Interested = "com.leapchat_interested";

@@ -47,30 +47,6 @@
             android:padding="@dimen/default_spacing_minor"
             android:src="@drawable/camera" />
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/img_photo2"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginRight="@dimen/default_spacing_micro"
-            android:layout_marginTop="40dp"
-            android:layout_toLeftOf="@id/img_photo1"
-            android:background="@drawable/border"
-            android:padding="@dimen/default_spacing_minor"
-            android:src="@drawable/camera" />
-
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/img_photo3"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginLeft="@dimen/default_spacing_micro"
-            android:layout_marginTop="40dp"
-            android:layout_toRightOf="@id/img_photo1"
-            android:background="@drawable/border"
-            android:padding="@dimen/default_spacing_minor"
-            android:src="@drawable/camera" />
-
     </developer.shivam.library.CrescentoContainer>
 
     <LinearLayout

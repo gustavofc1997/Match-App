@@ -7,6 +7,16 @@ package com.devsideas.leapchat.domain;
 public class NearDevice {
     private String mName;
     private String mToken;
+    private String mPicture;
+
+
+    public String getmPicture() {
+        return mPicture;
+    }
+
+    public void setmPicture(String mPicture) {
+        this.mPicture = mPicture;
+    }
 
     public String getmName() {
         return mName;

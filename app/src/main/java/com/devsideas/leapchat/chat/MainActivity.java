@@ -14,13 +14,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.devsideas.leapchat.R;
+import com.devsideas.leapchat.util.SharedPreferenceHelper;
+import com.firebase.client.Firebase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener,
-        MessageDataSource.MessagesCallbacks{
+        MessageDataSource.MessagesCallbacks {
 
     public static final String USER_EXTRA = "USER";
 
@@ -38,38 +40,34 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.chat_activity_main);
-
-        mRecipient = "Ashok";
-
-        mListView = (ListView)findViewById(R.id.messages_list);
+        Firebase.setAndroidContext(this);
+        mRecipient = getIntent().getExtras().getString("phone");
+        mListView = (ListView) findViewById(R.id.messages_list);
         mMessages = new ArrayList<>();
         mAdapter = new MessagesAdapter(mMessages);
         mListView.setAdapter(mAdapter);
-
         setTitle(mRecipient);
-        if (getSupportActionBar() != null){
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        Button sendMessage = (Button)findViewById(R.id.send_message);
+        Button sendMessage = (Button) findViewById(R.id.send_message);
         sendMessage.setOnClickListener(this);
-
-        String[] ids = {"Ajay","-", "Gustavo"};
+        String[] ids = {SharedPreferenceHelper.loadString(SharedPreferenceHelper.Phone), "-", mRecipient};
         Arrays.sort(ids);
-        mConvoId = ids[0]+ids[1]+ids[2];
-
+        mConvoId = ids[0] + ids[1];
         mListener = MessageDataSource.addMessagesListener(mConvoId, this);
 
     }
 
     public void onClick(View v) {
-        EditText newMessageView = (EditText)findViewById(R.id.new_message);
+        EditText newMessageView = (EditText) findViewById(R.id.new_message);
         String newMessage = newMessageView.getText().toString();
         newMessageView.setText("");
         Message msg = new Message();
         msg.setDate(new Date());
         msg.setText(newMessage);
-        msg.setSender("Gustavo");
+        msg.setSender(SharedPreferenceHelper.loadString(SharedPreferenceHelper.Phone));
         MessageDataSource.saveMessage(msg, mConvoId);
     }
 
@@ -77,6 +75,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public void onMessageAdded(Message message) {
         mMessages.add(message);
         mAdapter.notifyDataSetChanged();
+        mListView.setSelection(mAdapter.getCount() - 1);
     }
 
     @Override
@@ -87,31 +86,32 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
 
     private class MessagesAdapter extends ArrayAdapter<Message> {
-        MessagesAdapter(ArrayList<Message> messages){
+        MessagesAdapter(ArrayList<Message> messages) {
             super(MainActivity.this, R.layout.message, R.id.message, messages);
         }
+
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             convertView = super.getView(position, convertView, parent);
             Message message = getItem(position);
 
-            TextView nameView = (TextView)convertView.findViewById(R.id.message);
+            TextView nameView = (TextView) convertView.findViewById(R.id.message);
             nameView.setText(message.getText());
 
-            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams)nameView.getLayoutParams();
+            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) nameView.getLayoutParams();
 
             int sdk = Build.VERSION.SDK_INT;
-            if (message.getSender().equals("Gustavo")){
+            if (message.getSender().equals(SharedPreferenceHelper.loadString(SharedPreferenceHelper.Phone))) {
                 if (sdk >= Build.VERSION_CODES.JELLY_BEAN) {
                     nameView.setBackground(getDrawable(R.drawable.bubble_right_green));
-                } else{
+                } else {
                     nameView.setBackgroundDrawable(getDrawable(R.drawable.bubble_right_green));
                 }
                 layoutParams.gravity = Gravity.RIGHT;
-            }else{
+            } else {
                 if (sdk >= Build.VERSION_CODES.JELLY_BEAN) {
                     nameView.setBackground(getDrawable(R.drawable.bubble_left_gray));
-                } else{
+                } else {
                     nameView.setBackgroundDrawable(getDrawable(R.drawable.bubble_left_gray));
                 }
                 layoutParams.gravity = Gravity.LEFT;

@@ -16,6 +16,7 @@ public class IntentHelper {
 
     public static void goToHome(Activity activity) {
         launchIntent(activity, HomeActivity.class);
+        activity.finish();
     }
 
     public static void goToSignUp(Activity activity) {

@@ -17,6 +17,7 @@ public class DeviceMessage {
 
     private final String mUUID;
     private final String mUserName;
+    private final String mUrlPhoto;
 
     /**
      * Builds a new {@link Message} object using a unique identifier.
@@ -41,8 +42,13 @@ public class DeviceMessage {
         return mUUID;
     }
 
+    public String getmUrlPhoto() {
+        return mUrlPhoto;
+    }
+
     private DeviceMessage() {
         mUUID = FirebaseInstanceId.getInstance().getToken();
+        mUrlPhoto = SharedPreferenceHelper.loadString(SharedPreferenceHelper.MY_PIC);
         mUserName = SharedPreferenceHelper.loadString(SharedPreferenceHelper.Name);
         // TODO(developer): add other fields that must be included in the Nearby Message payload.
     }

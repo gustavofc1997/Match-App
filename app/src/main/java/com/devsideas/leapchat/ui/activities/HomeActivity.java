@@ -1,24 +1,36 @@
 package com.devsideas.leapchat.ui.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.Toast;
 
 import com.devsideas.leapchat.R;
+import com.devsideas.leapchat.chat.MainActivity;
 import com.devsideas.leapchat.domain.NearDevice;
 import com.devsideas.leapchat.ui.activities.adapters.RecyclerAdapter;
 import com.devsideas.leapchat.util.DeviceMessage;
 import com.devsideas.leapchat.util.ItemClick;
+import com.devsideas.leapchat.util.RecyclerListener;
+import com.devsideas.leapchat.util.SharedPreferenceHelper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -31,12 +43,23 @@ import com.google.android.gms.nearby.messages.PublishOptions;
 import com.google.android.gms.nearby.messages.Strategy;
 import com.google.android.gms.nearby.messages.SubscribeCallback;
 import com.google.android.gms.nearby.messages.SubscribeOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -51,9 +74,8 @@ import okhttp3.Response;
  */
 
 public class HomeActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener, FirebaseAuth.AuthStateListener {
     private static final String TAG = HomeActivity.class.getSimpleName();
-    private FirebaseAuth.AuthStateListener mAuthListener;
     private static final int TTL_IN_SECONDS = 3 * 60; // Three minutes.
     private FirebaseAuth mAuth;
 
@@ -88,9 +110,11 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
     private GoogleApiClient mGoogleApiClient;
 
     // Views.
+    private HashMap<String, NearDevice> mDevices;
     private SwitchCompat mPublishSwitch;
     private SwitchCompat mSubscribeSwitch;
     private ArrayList<NearDevice> mList;
+    private LinearLayoutManager mLayoutManager;
     public static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
     /**
@@ -108,52 +132,72 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
      */
     private RecyclerAdapter mAdapter;
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        int SDK_INT = android.os.Build.VERSION.SDK_INT;
+        if (SDK_INT > 8) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                    .permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            //your codes here
+
+        }
+        if (getIntent().getExtras() != null) {
+            if (getIntent().getExtras().containsKey("phone")) {
+                String title = getIntent().getExtras().getString("phone");
+                String[] result = title.split(",");
+                showAlert(result[0], result[1], getIntent().getExtras().getString("body"), getIntent().getExtras().getString("picture"));
+            } else {
+                Intent chat = new Intent(HomeActivity.this, MainActivity.class);
+                chat.putExtra("phone", getIntent().getExtras().getString("chat"));
+                startActivity(chat);
+            }
+        }
         mList = new ArrayList<>();
+        mDevices = new HashMap<>();
         mRecyclerNearDevices = (RecyclerView) findViewById(R.id.nearby_devices_list_view);
         mSubscribeSwitch = (SwitchCompat) findViewById(R.id.subscribe_switch);
         mPublishSwitch = (SwitchCompat) findViewById(R.id.publish_switch);
         mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
+        if (mAuth.getCurrentUser() == null) {
+            mAuth.signInWithEmailAndPassword(SharedPreferenceHelper.loadString(SharedPreferenceHelper.Phone) + "@leapchat.com", SharedPreferenceHelper.loadString(SharedPreferenceHelper.Phone)).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (!task.isSuccessful()) {
+                        Log.w(TAG, "signInWithEmail:failed", task.getException());
+                        Toast.makeText(HomeActivity.this, "Auth Failed",
+                                Toast.LENGTH_SHORT).show();
+                    }
                 }
-                // ...
-            }
-        };
+            });
+        }
+        mPubMessage = DeviceMessage.newNearbyMessage();
         // Build the message that is going to be published. This contains the device name and a
         // UUID.
         mPubMessage = DeviceMessage.newNearbyMessage();
-
         mMessageListener = new MessageListener() {
             @Override
             public void onFound(final Message message) {
                 // Called when a new message is found.
                 NearDevice device = new NearDevice();
+                device.setmPicture(DeviceMessage.fromNearbyMessage(message).getmUrlPhoto());
                 device.setmName(DeviceMessage.fromNearbyMessage(message).getUserName());
                 device.setmToken(DeviceMessage.fromNearbyMessage(message).getmUUID());
-                mAdapter.setItems(device);
+                mDevices.put(device.getmName(), device);
+                mAdapter.setItems(getList());
             }
 
             @Override
             public void onLost(final Message message) {
                 // Called when a message is no longer detectable nearby.
-                NearDevice device = new NearDevice();
-                device.setmName(DeviceMessage.fromNearbyMessage(message).getUserName());
-                device.setmToken(DeviceMessage.fromNearbyMessage(message).getmUUID());
-                mAdapter.rmItem(device);
+                mDevices.remove(DeviceMessage.fromNearbyMessage(message).getUserName());
+                mAdapter.setItems(getList());
             }
         };
+
 
         mSubscribeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -187,16 +231,34 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
             }
         });
 
-        mAdapter = new RecyclerAdapter(HomeActivity.this, new ItemClick() {
-            @Override
-            public void onItemClick(View v, int position) {
-                onUserSelected(mAdapter.getitem(position));
-            }
-        });
+        mAdapter = new RecyclerAdapter(HomeActivity.this);
         if (mRecyclerNearDevices != null) {
+            mRecyclerNearDevices.setLayoutManager(mLayoutManager = new LinearLayoutManager(this));
             mRecyclerNearDevices.setAdapter(mAdapter);
         }
+        mAdapter.setItemClickListener(new RecyclerListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                try {
+                    onUserSelected(mAdapter.getitem(position));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
         buildGoogleApiClient();
+    }
+
+    private ArrayList<NearDevice> getList() {
+        ArrayList<NearDevice> mDevice = new ArrayList<>();
+        Iterator it = mDevices.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            mDevice.add((NearDevice) pair.getValue());
+            it.remove(); // avoids a ConcurrentModificationException
+        }
+        return mDevice;
+
     }
 
     private void buildGoogleApiClient() {
@@ -340,7 +402,75 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
-    private void sendNotification(final String reg_token) {
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mAuth.removeAuthStateListener(this);
+    }
+
+    private void showAlert(final String phone, final String tokentosend, String body, String pic) {
+        try {
+            new SweetAlertDialog(this, SweetAlertDialog.CUSTOM_IMAGE_TYPE)
+                    .setCancelText(getString(android.R.string.no))
+                    .setTitleText("Alguien quiere conocerte!")
+                    .setCustomImage(drawableFromUrl(pic))
+                    .setConfirmText(getString(android.R.string.yes))
+                    .setContentText(body)
+                    .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+                            sweetAlertDialog.dismissWithAnimation();
+                        }
+                    })
+                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(final SweetAlertDialog sDialog) {
+                            chatAccepted(SharedPreferenceHelper.loadString(SharedPreferenceHelper.Name), SharedPreferenceHelper.loadString(SharedPreferenceHelper.Phone), tokentosend);
+                            sDialog.dismissWithAnimation();
+                            Intent chat = new Intent(HomeActivity.this, MainActivity.class);
+                            chat.putExtra("phone", phone);
+                            startActivity(chat);
+
+                        }
+                    })
+                    .show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        if (user != null) {
+            // User is signed in
+            Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+        } else {
+            // User is signed out
+            Log.d(TAG, "onAuthStateChanged:signed_out");
+            finish();
+        }
+    }
+
+
+    public static Drawable drawableFromUrl(String url) throws IOException {
+        Bitmap x;
+
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        connection.connect();
+        InputStream input = connection.getInputStream();
+
+        x = BitmapFactory.decodeStream(input);
+        return new BitmapDrawable(x);
+    }
+
+    private void chatAccepted(final String name, final String phone, final String token) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -348,21 +478,20 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
                     OkHttpClient client = new OkHttpClient();
                     JSONObject json = new JSONObject();
                     JSONObject dataJson = new JSONObject();
-                    dataJson.put("body", "Hi this is sent from device to device");
-                    dataJson.put("title", "dummy title");
+                    dataJson.put("body", name + " ha aceptado tu invitacion");
+                    dataJson.put("title", phone);
                     json.put("notification", dataJson);
-                    json.put("to", reg_token);
+                    json.put("to", token);
                     RequestBody body = RequestBody.create(JSON, json.toString());
                     Request request = new Request.Builder()
-                            .header("Authorization", "key=AIzaSyBR9YsG6-tp1AdMP4083DCBpih6k9Om5Fc")
+                            .header("Authorization", "key=AAAAIcrqQR4:APA91bGWEQnSElpdJH-HSV-FEDHJJSJNE45dtdSml3JdFY0G-XATiV-L9jiMa5D-MGQMhH3qjPezkNo8MhzznkOtWYJMrlrlgBXxNb3YR989mCxxpRCbokQiQu9reBvxhKKft3q0Vrag")
                             .url("https://fcm.googleapis.com/fcm/send")
                             .post(body)
                             .build();
                     Response response = client.newCall(request).execute();
                     String finalResponse = response.body().string();
-                    System.out.println(finalResponse);
                 } catch (Exception e) {
-                    Log.d(TAG,e+"");
+                    Log.d(TAG, e + "Catch");
                 }
                 return null;
             }
@@ -370,9 +499,40 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
 
     }
 
-    private void onUserSelected(final NearDevice device) {
-        new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
+    private void sendNotification(final String mytoken, final String reg_token, final String name, final String phone) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    OkHttpClient client = new OkHttpClient();
+                    JSONObject json = new JSONObject();
+                    JSONObject dataJson = new JSONObject();
+                    dataJson.put("body", "Quieres conocer a " + name + "?" + "," + SharedPreferenceHelper.loadString(SharedPreferenceHelper.MY_PIC));
+                    dataJson.put("title", phone + "," + mytoken);
+                    json.put("notification", dataJson);
+                    json.put("to", reg_token);
+                    RequestBody body = RequestBody.create(JSON, json.toString());
+                    Request request = new Request.Builder()
+                            .header("Authorization", "key=AAAAIcrqQR4:APA91bGWEQnSElpdJH-HSV-FEDHJJSJNE45dtdSml3JdFY0G-XATiV-L9jiMa5D-MGQMhH3qjPezkNo8MhzznkOtWYJMrlrlgBXxNb3YR989mCxxpRCbokQiQu9reBvxhKKft3q0Vrag")
+                            .url("https://fcm.googleapis.com/fcm/send")
+                            .post(body)
+                            .build();
+                    Response response = client.newCall(request).execute();
+                    String finalResponse = response.body().string();
+                    System.out.println(finalResponse);
+                } catch (Exception e) {
+                    Log.d(TAG, e + "");
+                }
+                return null;
+            }
+        }.execute();
+
+    }
+
+    private void onUserSelected(final NearDevice device) throws IOException {
+        new SweetAlertDialog(this, SweetAlertDialog.CUSTOM_IMAGE_TYPE)
                 .setTitleText(getString(R.string.interested))
+                .setCustomImage(drawableFromUrl(device.getmPicture()))
                 .setCancelText(getString(android.R.string.no))
                 .setConfirmText(getString(android.R.string.yes))
                 .setContentText(getString(R.string.meet_people))
@@ -386,7 +546,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
                     @Override
                     public void onClick(final SweetAlertDialog sDialog) {
                         // reuse previous dialog instance
-                        sendNotification(device.getmToken());
+                        sendNotification(FirebaseInstanceId.getInstance().getToken(), device.getmToken(), device.getmName(), SharedPreferenceHelper.loadString(SharedPreferenceHelper.Phone));
                         sDialog.dismissWithAnimation();
                     }
                 })

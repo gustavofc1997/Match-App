@@ -1,10 +1,18 @@
 package com.devsideas.leapchat.ui.activities;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.ThumbnailUtils;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -23,15 +31,31 @@ import com.digits.sdk.android.ConfirmationCodeCallback;
 import com.digits.sdk.android.Digits;
 import com.digits.sdk.android.DigitsException;
 import com.digits.sdk.android.DigitsSession;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.weiwangcn.betterspinner.library.BetterSpinner;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import javax.inject.Inject;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 import io.fabric.sdk.android.Fabric;
@@ -41,56 +65,70 @@ public class SignUpActivity extends ImageGalleryActivity implements RadioGroup.O
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
     private static final String TWITTER_KEY = "ri1Tekkh5lrSwABgGafCGVOdO";
     private static final String TWITTER_SECRET = "QJ8Kbqd32NRwgywtRNm0wzrkSOAfAHFQEgFQPpTboxlH24disA";
+    private static final String TAG = "Signup";
     @Inject
     ImageLoader imageLoader;
-    @Bind(R.id.txt_name)
+    @BindView(R.id.txt_name)
     EditText mTxtName;
-    @Bind(R.id.radioGroup_genre)
+    @BindView(R.id.radioGroup_genre)
     RadioGroup mRadioGroup;
-    @Bind(R.id.radio_man)
+    @BindView(R.id.radio_man)
     RadioButton mRadioMan;
-    @Bind(R.id.radio_other)
+    @BindView(R.id.radio_other)
     RadioButton mRadioOther;
-    @Bind(R.id.radio_woman)
+    @BindView(R.id.radio_woman)
     RadioButton mRadioWoman;
-    @Bind(R.id.toolbar_signup)
+    @BindView(R.id.toolbar_signup)
     Toolbar mActionBar;
-    @Bind(R.id.spin_interested)
+    @BindView(R.id.spin_interested)
     BetterSpinner mSpin;
-    @Bind(R.id.img_photo1)
+    @BindView(R.id.img_photo1)
     CircleImageView mImgPhoto1;
-    @Bind(R.id.img_photo2)
-    CircleImageView mImgPhoto2;
-    @Bind(R.id.img_photo3)
-    CircleImageView mImgPhoto3;
-    private String pic1 = "Picture1";
-    private String pic2 = "Picture2";
-    private String pic3 = "Picture3";
-    private String path1 = "";
-    private String path2 = "";
-    private String path3 = "";
     private String mGenre = "";
     private String mInterested = "";
     private AuthCallback authCallback;
+    private boolean loadedPic;
+    private Bitmap picture;
+    SweetAlertDialog pDialog;
 
     private static final String[] INTERESTED = new String[]{
             "Hombres", "Mujeres", "Ambos"
     };
+    private FirebaseAuth mAuth;
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signup_activity);
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
         Fabric.with(this, new TwitterCore(authConfig), new Digits.Builder().build());
+        mAuth = FirebaseAuth.getInstance();
         authCallback = new AuthCallback() {
             @Override
-            public void success(DigitsSession session, String phoneNumber) {
+            public void success(DigitsSession session, final String phoneNumber) {
                 // Do something with the session
+                showDialog();
                 SharedPreferenceHelper.saveString(SharedPreferenceHelper.Phone, phoneNumber);
-                finish();
-                SharedPreferenceHelper.saveBoolean(SharedPreferenceHelper.ACTIVE, true);
-                IntentHelper.goToHome(SignUpActivity.this);
+                mAuth.createUserWithEmailAndPassword(SharedPreferenceHelper.loadString(SharedPreferenceHelper.Phone) + "@leapchat.com", phoneNumber).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        mAuth.signInWithEmailAndPassword(SharedPreferenceHelper.loadString(SharedPreferenceHelper.Phone) + "@leapchat.com", SharedPreferenceHelper.loadString(SharedPreferenceHelper.Phone)).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (!task.isSuccessful()) {
+                                    pDialog.dismiss();
+                                    Toast.makeText(SignUpActivity.this, "Auth Failed",
+                                            Toast.LENGTH_SHORT).show();
+                                } else {
+                                    savePicture(phoneNumber);
+                                    SharedPreferenceHelper.saveBoolean(SharedPreferenceHelper.ACTIVE, true);
+                                }
+                            }
+                        });
+
+                    }
+                });
             }
 
             @Override
@@ -99,55 +137,38 @@ public class SignUpActivity extends ImageGalleryActivity implements RadioGroup.O
             }
         };
         ButterKnife.bind(this);
+        mImgPhoto1.setOnClickListener(this);
         mRadioGroup.setOnCheckedChangeListener(this);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_dropdown_item_1line, INTERESTED);
         mSpin.setAdapter(adapter);
-        mImgPhoto1.setOnClickListener(this);
-        mImgPhoto2.setOnClickListener(this);
-        mImgPhoto3.setOnClickListener(this);
-    }
-
-    public AuthCallback getAuthCallback() {
-        return authCallback;
     }
 
     @OnClick(R.id.lab_signup)
     void signUp() {
-//        if (!path1.equals("") && !path2.equals("") && !path3.equals("")) {
         if (!mTxtName.getText().toString().equals("") && mTxtName.getText().toString().length() > 4) {
             if (!mGenre.equals("")) {
-                SharedPreferenceHelper.saveString(SharedPreferenceHelper.Name, mTxtName.getText().toString());
-                SharedPreferenceHelper.saveString(SharedPreferenceHelper.Genre, mGenre);
-//                    SharedPreferenceHelper.saveString(SharedPreferenceHelper.Interested, mGenre);
-//                        if (!mInterested.equals("")) {
-                AuthConfig.Builder digitsAuthConfigBuilder = new AuthConfig.Builder()
-                        .withAuthCallBack(authCallback);
-//                            .withCustomPhoneNumberScreen(confirmationCodeCallback)
-//                            .withPartnerKey(BuildConfig.PARTNER_KEY)
-                Digits.authenticate(digitsAuthConfigBuilder.build());
-//                        } else
-//                            Toasty.warning(this, getString(R.string.miss_interested), Toast.LENGTH_SHORT, true).show();
+                if (loadedPic) {
+                    SharedPreferenceHelper.saveString(SharedPreferenceHelper.Name, mTxtName.getText().toString());
+                    SharedPreferenceHelper.saveString(SharedPreferenceHelper.Genre, mGenre);
+                    AuthConfig.Builder digitsAuthConfigBuilder = new AuthConfig.Builder()
+                            .withAuthCallBack(authCallback);
+                    Digits.authenticate(digitsAuthConfigBuilder.build());
+                } else
+                    Toasty.warning(this, getString(R.string.miss_pictures), Toast.LENGTH_SHORT, true).show();
             } else
                 Toasty.warning(this, getString(R.string.miss_genre), Toast.LENGTH_SHORT, true).show();
         } else
             Toasty.warning(this, getString(R.string.miss_name), Toast.LENGTH_SHORT, true).show();
-//        } else
-//            Toasty.warning(this, getString(R.string.miss_pictures), Toast.LENGTH_SHORT, true).show();
     }
 
-
-    final ConfirmationCodeCallback confirmationCodeCallback = new ConfirmationCodeCallback() {
-        @Override
-        public void success(Intent intent) {
-            startActivity(intent);
-        }
-
-        @Override
-        public void failure(DigitsException error) {
-            Toasty.error(SignUpActivity.this, error.getMessage(), Toast.LENGTH_LONG, true).show();
-        }
-    };
+    private void showDialog() {
+        pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
+        pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        pDialog.setTitleText("Registrando Usuario");
+        pDialog.setCancelable(false);
+        pDialog.show();
+    }
 
     @Override
     public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
@@ -180,14 +201,65 @@ public class SignUpActivity extends ImageGalleryActivity implements RadioGroup.O
                 finish();
                 break;
             case R.id.img_photo1:
-                showDialogPicturesOptions(R.id.img_photo1, pic1);
+                loadedPic = true;
+                showDialogPicturesOptions(R.id.img_photo1, "pro_pic");
                 break;
-            case R.id.img_photo2:
-                showDialogPicturesOptions(R.id.img_photo2, pic2);
-                break;
-            case R.id.img_photo3:
-                showDialogPicturesOptions(R.id.img_photo3, pic3);
-                break;
+        }
+    }
+
+    private void savePicture(String phone) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReferenceFromUrl("gs://leapchat-160802.appspot.com/profile_picture");
+        StorageReference mountainsRef = storageRef.child(phone + ".jpg");
+        StorageReference mountainImagesRef = storageRef.child("images/" + phone + ".jpg");
+        mountainsRef.getName().equals(mountainImagesRef.getName());    // true
+        mountainsRef.getPath().equals(mountainImagesRef.getPath());    // false
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        picture.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        UploadTask uploadTask = mountainsRef.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                SharedPreferenceHelper.saveString(SharedPreferenceHelper.MY_PIC, downloadUrl.toString());
+                pDialog.dismiss();
+                IntentHelper.goToHome(SignUpActivity.this);
+            }
+        });
+    }
+
+
+    public Bitmap createFile(Uri uri, File file) {
+        InputStream is = null;
+        try {
+            is = getContentResolver().openInputStream(uri);
+            Bitmap bitmap = BitmapFactory.decodeStream(is);
+            is.close();
+            file.createNewFile();
+
+            //Convert bitmap to byte array
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, bos);
+
+            byte[] bitmapdata = bos.toByteArray();
+
+            //write the bytes in file
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(bitmapdata);
+            fos.flush();
+            fos.close();
+            return bitmap;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -196,8 +268,21 @@ public class SignUpActivity extends ImageGalleryActivity implements RadioGroup.O
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case SELECT_PICTURE:
+                if (resultCode == RESULT_OK) {
+                    File file = new File(getCacheDir(), "pro_pic.jpg");
+                    final int THUMBSIZE = 128;
+                    picture = ThumbnailUtils.extractThumbnail(createFile(data.getData(), file), THUMBSIZE, THUMBSIZE);
+                    mImgPhoto1.setImageBitmap(picture);
+                }
+
                 break;
             case PHOTO_CODE:
+                final String path = Environment.getExternalStorageDirectory() + File.separator + Environment.DIRECTORY_PICTURES + File.separator + "pro_pic";
+                Bitmap bitmapImage = BitmapFactory.decodeFile(path + ".jpg");
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                bitmapImage.compress(Bitmap.CompressFormat.JPEG, 50, bytes);
+                picture = Bitmap.createScaledBitmap(bitmapImage, 150, 150, true);
+                mImgPhoto1.setImageBitmap(picture);
                 break;
         }
     }
