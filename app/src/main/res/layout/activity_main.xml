@@ -1,29 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/color_unselected"
+    android:background="@android:color/white"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".ui.activities.HomeActivity">
+
+
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorAccent"
+        android:gravity="center"
+        android:weightSum="1">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="3.32"
+            android:text="LeapChat"
+            android:textColor="@android:color/white"
+            android:textSize="20sp" />
+
+    </android.support.v7.widget.Toolbar>
 
     <android.support.v7.widget.SwitchCompat
         android:id="@+id/subscribe_switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/people_around"
+        android:drawablePadding="4dp"
+        android:padding="@dimen/activity_horizontal_margin"
         android:text="@string/discover_nearby_devices"
         android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        app:thumbTint="@color/colorAccent"
+        app:trackTint="@color/gray_btn_bg_color" />
 
     <android.support.v7.widget.SwitchCompat
         android:id="@+id/publish_switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:thumbTint="@color/colorAccent"
+        app:trackTint="@color/gray_btn_bg_color"
+        android:drawableLeft="@drawable/me"
+        android:drawablePadding="4dp"
+        android:padding="@dimen/activity_horizontal_margin"
         android:text="@string/share_device_information"
         android:textSize="18sp"
         android:textStyle="bold" />
@@ -33,5 +58,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:overScrollMode="never" />
+        android:overScrollMode="never"
+        android:padding="@dimen/activity_horizontal_margin" />
 </LinearLayout>
