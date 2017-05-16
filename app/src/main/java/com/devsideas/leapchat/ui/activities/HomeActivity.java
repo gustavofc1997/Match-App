@@ -507,7 +507,7 @@ public class HomeActivity extends AppCompatActivity implements GoogleApiClient.C
                     OkHttpClient client = new OkHttpClient();
                     JSONObject json = new JSONObject();
                     JSONObject dataJson = new JSONObject();
-                    dataJson.put("body", "Quieres conocer a " + name + "?" + "," + SharedPreferenceHelper.loadString(SharedPreferenceHelper.MY_PIC));
+                    dataJson.put("body", "Quieres conocer a " + SharedPreferenceHelper.loadString(SharedPreferenceHelper.Name) + "?" + "," + SharedPreferenceHelper.loadString(SharedPreferenceHelper.MY_PIC));
                     dataJson.put("title", phone + "," + mytoken);
                     json.put("notification", dataJson);
                     json.put("to", reg_token);
